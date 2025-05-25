@@ -1,4 +1,5 @@
 # Family Graph App
+Vibe Coded With ChatGPT
 
 A dynamic relationship/family graph web app built with HTML5, CSS, and JavaScript.
 
