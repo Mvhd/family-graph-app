@@ -89,15 +89,23 @@
     <div id="multiSliders" style="display:none; margin-bottom:1rem;">
       <label>Sexual Intimacy: <span id="intimacyVal">15</span>/30</label>
       <input type="range" id="intimacySlider" min="0" max="30" value="15" />
-
-      <label>Communication: <span id="communicationVal">15</span>/30</label>
-      <input type="range" id="communicationSlider" min="0" max="30" value="15" />
-
-      <label>Trust: <span id="trustVal">15</span>/30</label>
-      <input type="range" id="trustSlider" min="0" max="30" value="15" />
-
-      <label>Fun Together: <span id="funVal">15</span>/30</label>
-      <input type="range" id="funSlider" min="0" max="30" value="15" />
+    </div>
+    <div class="question" id="question">Q2: How often do you talk deeply about emotions and plans?</div>
+    <div id="multiSliders2" style="display:none; margin-bottom:1rem;">
+  
+        <label>Communication: <span id="communicationVal">15</span>/30</label>
+        <input type="range" id="communicationSlider" min="0" max="30" value="15" />
+    </div>
+    <div class="question" id="question">Q3: What is the trust level?</div>
+    <div id="multiSliders3" style="display:none; margin-bottom:1rem;">
+        <label>Trust: <span id="trustVal">15</span>/30</label>
+        <input type="range" id="trustSlider" min="0" max="30" value="15" />
+    </div>
+    <div class="question" id="question">Q3: How often do you have fun?</div>
+    <div id="multiSliders4" style="display:none; margin-bottom:1rem;">
+  
+        <label>Fun Together: <span id="funVal">15</span>/30</label>
+        <input type="range" id="funSlider" min="0" max="30" value="15" />
     </div>
 
     <!-- Single slider for other questions -->
@@ -139,6 +147,9 @@
 
   // Multi sliders & labels for Q1
   const multiSlidersDiv = document.getElementById('multiSliders');
+  const multiSlidersDiv1 = document.getElementById('multiSliders1');
+  const multiSlidersDiv2 = document.getElementById('multiSliders2');
+  const multiSlidersDiv3 = document.getElementById('multiSliders3');
   const intimacySlider = document.getElementById('intimacySlider');
   const communicationSlider = document.getElementById('communicationSlider');
   const trustSlider = document.getElementById('trustSlider');
@@ -259,6 +270,9 @@
     if(currentQuestionIndex === 0){
       // Show multi sliders for Q1
       multiSlidersDiv.style.display = 'block';
+      multiSlidersDiv1.style.display = 'block';
+      multiSlidersDiv2.style.display = 'block';
+      multiSlidersDiv3.style.display = 'block';
       singleSliderContainer.style.display = 'none';
 
       intimacySlider.value = 15;
@@ -272,6 +286,9 @@
     } else {
       // Show single slider for others
       multiSlidersDiv.style.display = 'none';
+      multiSlidersDiv1.style.display = 'block';
+      multiSlidersDiv2.style.display = 'block';
+      multiSlidersDiv3.style.display = 'block';
       singleSliderContainer.style.display = 'block';
 
       slider.value = 5;
@@ -292,6 +309,8 @@
     }
   }
   function nextQuestion(){
+    alert("Thank you for checking this out!");
+    return false;
     if(currentQuestionIndex < questions.length -1){
       currentQuestionIndex++;
       updateQuestionUI();
