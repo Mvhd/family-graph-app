@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Relationship / Family Graph App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Family Graph App</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -23,7 +23,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       max-width: 600px;
       width: 90%;
-      /* text-align: center; */
+      text-align: center;
     }
     h1 {
       margin-bottom: 1rem;
@@ -34,16 +34,7 @@
     }
     .slider-value {
       font-weight: bold;
-      margin: 0.5rem 0 1rem 0;
-    }
-    label {
-      font-weight: 600;
-      display: block;
-      margin-top: 10px;
-    }
-    input[type=range] {
-      width: 100%;
-      margin-top: 4px;
+      margin: 0.5rem 0;
     }
     button {
       background-color: #4CAF50;
@@ -69,7 +60,6 @@
       background: #eef9f1;
       padding: 1rem;
       border-radius: 8px;
-      min-height: 120px;
     }
     #shareBtn, #navBtns {
       display: none;
@@ -82,38 +72,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>Relationship / Family Graph App</h1>
+    <h1>Family Graph App</h1>
     <div class="question" id="question">Q1: How many times do you have sex per week in a month?</div>
-
-    <!-- Multi sliders for Q1 -->
-    <div id="multiSliders" style="display:block; margin-bottom:1rem;">
-      <label>Sexual Intimacy: <span id="intimacyVal">15</span>/30</label>
-      <input type="range" id="intimacySlider" min="0" max="30" value="15" />
-    </div>
-    <div class="question" id="question2">Q2: How often do you talk deeply about emotions and plans?</div>
-    <div id="multiSliders2" style="display:block; margin-bottom:1rem;">
-  
-        <label>Communication: <span id="communicationVal">15</span>/30</label>
-        <input type="range" id="communicationSlider" min="0" max="30" value="15" />
-    </div>
-    <div class="question" id="question3">Q3: What is the trust level?</div>
-    <div id="multiSliders3" style="display:block; margin-bottom:1rem;">
-        <label>Trust: <span id="trustVal">15</span>/30</label>
-        <input type="range" id="trustSlider" min="0" max="30" value="15" />
-    </div>
-    <div class="question" id="question4">Q4: How often do you have fun?</div>
-    <div id="multiSliders4" style="display:block; margin-bottom:1rem;">
-  
-        <label>Fun Together: <span id="funVal">15</span>/30</label>
-        <input type="range" id="funSlider" min="0" max="30" value="15" />
-    </div>
-
-    <!-- Single slider for other questions -->
-    <div id="singleSliderContainer" style="display:none; margin-bottom:1rem;">
-      <input type="range" id="answerSlider" min="0" max="10" value="5" />
-      <div class="slider-value" id="sliderValue">5</div>
-    </div>
-
+    <input type="range" id="answerSlider" min="0" max="10" value="5" />
+    <div class="slider-value" id="sliderValue">5</div>
     <div>
       <button onclick="submitAnswer()">Submit</button>
       <div id="navBtns">
@@ -122,239 +84,146 @@
       </div>
       <button id="shareBtn" onclick="shareGraph()">Share Graph</button>
     </div>
-
     <canvas id="resultChart" width="400" height="300"></canvas>
     <div id="analysis"></div>
   </div>
 
-<script>
-  const questions = [
-    "How many times do you have sex per week in a month?",
-    "How often do you talk deeply about emotions and plans?",
-    "How many days in a month do you spend quality time without distractions?",
-    "How often do you feel emotionally connected with your partner?",
-    "How many conflicts are resolved calmly in a month?"
-  ];
-
-  let currentQuestionIndex = 0;
-
-  const questionBox = document.getElementById('question');
-  const analysisBox = document.getElementById('analysis');
-  const shareBtn = document.getElementById('shareBtn');
-  const navBtns = document.getElementById('navBtns');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-
-  // Multi sliders & labels for Q1
-  const multiSlidersDiv = document.getElementById('multiSliders');
-  const multiSlidersDiv1 = document.getElementById('multiSliders1');
-  const multiSlidersDiv2 = document.getElementById('multiSliders2');
-  const multiSlidersDiv3 = document.getElementById('multiSliders3');
-  const intimacySlider = document.getElementById('intimacySlider');
-  const communicationSlider = document.getElementById('communicationSlider');
-  const trustSlider = document.getElementById('trustSlider');
-  const funSlider = document.getElementById('funSlider');
-
-  const intimacyVal = document.getElementById('intimacyVal');
-  const communicationVal = document.getElementById('communicationVal');
-  const trustVal = document.getElementById('trustVal');
-  const funVal = document.getElementById('funVal');
-
-  // Single slider & label
-  const singleSliderContainer = document.getElementById('singleSliderContainer');
-  const slider = document.getElementById('answerSlider');
-  const sliderValue = document.getElementById('sliderValue');
-
-  // Update multi slider labels on input
-  [intimacySlider, communicationSlider, trustSlider, funSlider].forEach((sliderElem) => {
-    sliderElem.oninput = () => {
-      intimacyVal.textContent = intimacySlider.value;
-      communicationVal.textContent = communicationSlider.value;
-      trustVal.textContent = trustSlider.value;
-      funVal.textContent = funSlider.value;
-    };
-  });
-
-  // Update single slider label
-  slider.oninput = () => {
-    sliderValue.textContent = slider.value;
-  };
-
-  // Generate values for other questions from single slider (0-10 scaled)
-  function generateData(value) {
-    const base = value * 3;
-    return [
-      Math.min(30, base),         // Sexual Intimacy
-      Math.min(30, value * 2),    // Communication
-      Math.min(30, value * 2.5),  // Trust
-      Math.min(30, value * 2.2)   // Fun Together
+  <script>
+    const questions = [
+      "How many times do you have sex per week in a month?",
+      "How often do you talk deeply about emotions and plans?",
+      "How many days in a month do you spend quality time without distractions?",
+      "How often do you feel emotionally connected with your partner?",
+      "How many conflicts are resolved calmly in a month?"
     ];
-  }
 
-  // Analysis logic based on scores
-  function getAnalysis(data) {
-    const [sex, communication, trust, fun] = data;
-    const avg = (sex + communication + trust + fun) / 4;
-    let summary = `<strong>Relationship Metrics:</strong><br>`;
-    summary += `Sexual Intimacy: ${sex}/30<br>`;
-    summary += `Communication: ${communication}/30<br>`;
-    summary += `Trust: ${trust}/30<br>`;
-    summary += `Fun Together: ${fun}/30<br><br>`;
-    summary += `<strong>AI Insight:</strong> Average score is ${avg.toFixed(1)} out of 30.<br>`;
+    let currentQuestionIndex = 0;
 
-    if(avg >= 22){
-      summary += "✅ Strong relationship. Keep nurturing it!";
-    } else if(avg >= 15){
-      summary += "⚠️ Decent relationship. There is room for improvement.";
-    } else {
-      summary += "❌ Relationship may need attention. Consider open communication.";
-    }
-    return summary;
-  }
+    const slider = document.getElementById('answerSlider');
+    const sliderValue = document.getElementById('sliderValue');
+    const questionBox = document.getElementById('question');
+    const analysisBox = document.getElementById('analysis');
+    const shareBtn = document.getElementById('shareBtn');
+    const navBtns = document.getElementById('navBtns');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
 
-  // Submit button handler
-  function submitAnswer() {
-    let values;
-    if(currentQuestionIndex === 0){
-      // Use all 4 sliders on Q1
-      values = [
-        Number(intimacySlider.value),
-        Number(communicationSlider.value),
-        Number(trustSlider.value),
-        Number(funSlider.value)
+    slider.oninput = () => {
+      sliderValue.textContent = slider.value;
+    };
+
+    function generateData(value) {
+      // The graph data is absolute numbers scaled by 3, capped at 30
+      const base = value * 3;
+      return [
+        Math.min(30, base),         // Sexual Intimacy
+        Math.min(30, value * 2),    // Communication
+        Math.min(30, value * 2.5),  // Trust
+        Math.min(30, value * 2.2)   // Fun Together
       ];
-    } else {
-      const val = parseInt(slider.value);
-      values = generateData(val);
     }
 
-    const ctx = document.getElementById('resultChart').getContext('2d');
-    if(window.myChart) window.myChart.destroy();
+    function getAnalysis(data) {
+      const [sex, communication, trust, fun] = data;
+      const avg = (sex + communication + trust + fun) / 4;
+      let summary = `<strong>Relationship Metrics:</strong><br>`;
+      summary += `Sexual Intimacy: ${sex}/30<br>`;
+      summary += `Communication: ${communication}/30<br>`;
+      summary += `Trust: ${trust}/30<br>`;
+      summary += `Fun Together: ${fun}/30<br><br>`;
+      summary += `<strong>AI Insight:</strong> Average score is ${avg.toFixed(1)} out of 30.<br>`;
 
-    window.myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Sexual Intimacy', 'Communication', 'Trust', 'Fun Together'],
-        datasets: [{
-          label: 'Monthly Relationship Metrics',
-          data: values,
-          backgroundColor: ['#4CAF50', '#2196F3', '#FFC107', '#9C27B0'],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 30
+      if(avg >= 22){
+        summary += "✅ Strong relationship. Keep nurturing it!";
+      } else if(avg >= 15){
+        summary += "⚠️ Decent relationship. There is room for improvement.";
+      } else {
+        summary += "❌ Relationship may need attention. Consider open communication.";
+      }
+      return summary;
+    }
+
+    function submitAnswer() {
+      const value = parseInt(slider.value);
+      const values = generateData(value);
+
+      const ctx = document.getElementById('resultChart').getContext('2d');
+      if(window.myChart) window.myChart.destroy();
+
+      window.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Sexual Intimacy', 'Communication', 'Trust', 'Fun Together'],
+          datasets: [{
+            label: 'Monthly Relationship Metrics',
+            data: values,
+            backgroundColor: ['#4CAF50', '#2196F3', '#FFC107', '#9C27B0'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 30
+            }
           }
         }
-      }
-    });
+      });
 
-    const analysis = getAnalysis(values);
-    analysisBox.innerHTML = analysis;
-    shareBtn.style.display = 'inline-block';
-    navBtns.style.display = 'block';
-    updateNavButtons();
-  }
+      const analysis = getAnalysis(values);
+      analysisBox.innerHTML = analysis;
+      shareBtn.style.display = 'inline-block';
+      navBtns.style.display = 'block';
+      updateNavButtons();
+    }
 
-  // Update UI when question changes
-  function updateQuestionUI() {
-    questionBox.textContent = `Q${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]}`;
-    analysisBox.innerHTML = "";
-    shareBtn.style.display = 'none';
-    navBtns.style.display = 'none';
-    if(window.myChart) window.myChart.destroy();
-
-    if(currentQuestionIndex === 0){
-      // Show multi sliders for Q1
-      multiSlidersDiv.style.display = 'block';
-      multiSlidersDiv1.style.display = 'block';
-      multiSlidersDiv2.style.display = 'block';
-      multiSlidersDiv3.style.display = 'block';
-      singleSliderContainer.style.display = 'none';
-
-      intimacySlider.value = 15;
-      communicationSlider.value = 15;
-      trustSlider.value = 15;
-      funSlider.value = 15;
-      intimacyVal.textContent = 15;
-      communicationVal.textContent = 15;
-      trustVal.textContent = 15;
-      funVal.textContent = 15;
-    } else {
-      // Show single slider for others
-      multiSlidersDiv.style.display = 'none';
-      multiSlidersDiv1.style.display = 'block';
-      multiSlidersDiv2.style.display = 'block';
-      multiSlidersDiv3.style.display = 'block';
-      singleSliderContainer.style.display = 'block';
-
+    function updateQuestionUI() {
+      questionBox.textContent = `Q${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]}`;
       slider.value = 5;
       sliderValue.textContent = 5;
+      analysisBox.innerHTML = "";
+      shareBtn.style.display = 'none';
+      navBtns.style.display = 'none';
+      if(window.myChart) window.myChart.destroy();
     }
-    updateNavButtons();
-  }
 
-  // Navigation buttons logic
-  function updateNavButtons(){
-    prevBtn.disabled = currentQuestionIndex === 0;
-    nextBtn.disabled = currentQuestionIndex === questions.length - 1;
-  }
-  function prevQuestion(){
-    if(currentQuestionIndex > 0){
-      currentQuestionIndex--;
-      updateQuestionUI();
-    }
-  }
-  function nextQuestion(){
-    alert("Thank you for checking this out!");
-    return false;
-    if(currentQuestionIndex < questions.length -1){
-      currentQuestionIndex++;
-      updateQuestionUI();
-    }
-  }
-
-  // Share graph function (basic example: screenshot + share text)
-  async function shareGraph(){
-    try {
-      const canvas = document.getElementById('resultChart');
-      const imageUrl = canvas.toDataURL('image/png');
-      const shareData = {
-        title: 'Family Graph App',
-        text: `Your relationship or family graph for question ${currentQuestionIndex + 1}: "${questions[currentQuestionIndex]}"`,
-        files: [
-          dataURLtoFile(imageUrl, 'graph.png')
-        ]
-      };
-
-      if (navigator.canShare && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
-      } else {
-        alert('Sharing not supported. You can right-click the graph and save the image.');
+    function nextQuestion() {
+      alert("Thank you for trying this vibe!");
+      return false;
+      if(currentQuestionIndex < questions.length - 1){
+        currentQuestionIndex++;
+        updateQuestionUI();
       }
-    } catch (err) {
-      alert('Error sharing: ' + err);
     }
-  }
 
-  // Helper: Convert dataURL to File object for share API
-  function dataURLtoFile(dataurl, filename) {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while(n--){
-      u8arr[n] = bstr.charCodeAt(n);
+    function prevQuestion() {
+      if(currentQuestionIndex > 0){
+        currentQuestionIndex--;
+        updateQuestionUI();
+      }
     }
-    return new File([u8arr], filename, {type:mime});
-  }
 
-  // Initialize UI on load
-  updateQuestionUI();
-</script>
+    function updateNavButtons() {
+      prevBtn.disabled = currentQuestionIndex === 0;
+      nextBtn.disabled = currentQuestionIndex === questions.length -1;
+    }
+
+    function shareGraph() {
+      const summaryText = analysisBox.innerText;
+      const shareData = {
+        title: 'Your Relationship Graph',
+        text: `Your relationship or family graph summary:\n${summaryText}`,
+        url: window.location.href
+      };
+      if(navigator.share){
+        navigator.share(shareData).catch(err => alert("Share failed: " + err));
+      } else {
+        alert("Sharing is not supported on this device.");
+      }
+    }
+
+    updateNavButtons();
+  </script>
 </body>
 </html>
